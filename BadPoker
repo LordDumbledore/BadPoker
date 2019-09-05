@@ -1,0 +1,1313 @@
+BadPoker
+
+using System;
+using static System.Console;
+
+enum CardID
+{
+	A_sp = 101, II_sp = 102, III_sp = 103, IV_sp = 104, V_sp = 105, VI_sp = 106, VII_sp = 107, VIII_sp = 108, IX_sp = 109, X_sp = 110, J_sp = 111, Q_sp = 112, K_sp = 113,
+	A_he = 201, II_he = 202, III_he = 203, IV_he = 204, V_he = 205, VI_he = 206, VII_he = 207, VIII_he = 208, IX_he = 209, X_he = 210, J_he = 211, Q_he = 212, K_he = 213,
+	A_cl = 301, II_cl = 302, III_cl = 303, IV_cl = 304, V_cl = 305, VI_cl = 306, VII_cl = 307, VIII_cl = 308, IX_cl = 309, X_cl = 310, J_cl = 311, Q_cl = 312, K_cl = 313,
+	A_di = 401, II_di = 402, III_di = 403, IV_di = 404, V_di = 405, VI_di = 406, VII_di = 407, VIII_di = 408, IX_di = 409, X_di = 410, J_di = 411, Q_di = 412, K_di = 413
+}
+
+
+namespace cards
+{
+	class Program
+	{
+		static void Main(string[] args)
+		{
+			int[] Deck = new int[] { 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+				60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60,
+				60, 60, 60, 60, 60 };
+			#region
+			Player P1 = new Player();
+			Player P2 = new Player();
+			Player P3 = new Player();
+			Player P4 = new Player();
+			Player P5 = new Player();
+			Table table = new Table();
+			#endregion
+			int NumOfPlayers;
+			while (true)
+			{
+				WriteLine("How Many Players? 2-5");
+				try
+				{
+					NumOfPlayers = Convert.ToInt32(ReadLine());
+					if (NumOfPlayers < 2 || NumOfPlayers > 5)
+						WriteLine("Enter a valid number of players");
+					else
+						break;
+				}
+				catch (FormatException)
+				{
+					WriteLine("Enter a number");
+				}
+			}
+
+			Setup(P1, P2, P3, P4, P5, NumOfPlayers);
+
+			for (int PlayerStart = 1; true; ++PlayerStart)
+			{
+				if (PlayerStart > NumOfPlayers)
+					PlayerStart = 1;
+				Game(P1, P2, P3, P4, P5, PlayerStart, NumOfPlayers, table, Deck);
+			}
+
+		}
+
+		static void Setup(Player temp, Player temp2, Player temp3, Player temp4, Player temp5, int NumOfPlayers)
+		{
+			for (int PlayerNum = 2; PlayerNum <= NumOfPlayers; ++PlayerNum)
+				switch (PlayerNum)
+				{
+					case 2:
+						Write("Enter the players name >> ");
+						temp.Name = ReadLine();
+						temp.Money = 1000;
+						Write("Enter the players name >> ");
+						temp2.Name = ReadLine();
+						temp2.Money = 1000;
+						break;
+					case 3:
+						Write("Enter the players name >> ");
+						temp3.Name = ReadLine();
+						temp3.Money = 1000;
+						break;
+					case 4:
+						Write("Enter the players name >> ");
+						temp4.Name = ReadLine();
+						temp4.Money = 1000;
+						break;
+					case 5:
+						Write("Enter the players name >> ");
+						temp5.Name = ReadLine();
+						temp5.Money = 1000;
+						break;
+				}
+
+		}
+
+
+		static void Game(Player P1, Player P2, Player P3, Player P4, Player P5, int Dealer, int NumOfPlayers, Table table, params int[] Deck)
+		{
+			Shuffle(Deck);
+
+			int PlayerTurn, amount;
+			table.DeckPos = 1;
+			int[] TableHand = new int[5];
+			table.TopBet = 0;
+			table.MinimumBet = 50;
+
+			if (Dealer + 1 > NumOfPlayers)
+					PlayerTurn = 1;
+				else
+					PlayerTurn = Dealer + 1;
+
+			//Blinds
+			for (int Blind = 25; Blind <= 50; Blind += 25)
+			{
+				if (PlayerTurn > NumOfPlayers)
+					PlayerTurn = 1;
+				switch (PlayerTurn)
+				{
+					case 1:
+						if (P1.Money < Blind)
+							amount = P1.Money;
+						else
+							amount = Blind;
+						table.Pot += amount;
+						P1.Money = P1.Money - amount;
+						P1.CurrentPot += amount;
+						if (table.TopBet < amount)
+							table.TopBet = amount;
+						++PlayerTurn;
+						break;
+					case 2:
+						if (P2.Money < Blind)
+							amount = P2.Money;
+						else
+							amount = Blind;
+						table.Pot += amount;
+						P2.Money = P2.Money - amount;
+						P2.CurrentPot += amount;
+						if (table.TopBet < amount)
+							table.TopBet = amount;
+						++PlayerTurn;
+						break;
+					case 3:
+						if (P3.Money < Blind)
+							amount = P3.Money;
+						else
+							amount = Blind;
+						table.Pot += amount;
+						P3.Money = P3.Money - amount;
+						P3.CurrentPot += amount;
+						if (table.TopBet < amount)
+							table.TopBet = amount;
+						++PlayerTurn;
+						break;
+					case 4:
+						if (P4.Money < Blind)
+							amount = P4.Money;
+						else
+							amount = Blind;
+						table.Pot += amount;
+						P4.Money = P4.Money - amount;
+						P4.CurrentPot += amount;
+						if (table.TopBet < amount)
+							table.TopBet = amount;
+						++PlayerTurn;
+						break;
+					case 5:
+						if (P5.Money < Blind)
+							amount = P5.Money;
+						else
+							amount = Blind;
+						table.Pot += amount;
+						P5.Money = P5.Money - amount;
+						P5.CurrentPot += amount;
+						if (table.TopBet < amount)
+							table.TopBet = amount;
+						++PlayerTurn;
+						break;
+				}
+			}
+
+			//distributes cards
+			for (int GoAround = 1; GoAround <= 2; ++GoAround)
+			{
+				for (int PlayerNum = 2; PlayerNum <= NumOfPlayers; ++PlayerNum)
+					switch (PlayerNum)
+					{
+						case 2:
+							if (GoAround == 1)
+							{
+								P1.Card1 = Cardname(Deck[table.DeckPos]);
+								P1.Card1Name = Convert.ToString((CardID)P1.Card1);
+								++table.DeckPos;
+								P2.Card1 = Cardname(Deck[table.DeckPos]);
+								P2.Card1Name = Convert.ToString((CardID)P2.Card1);
+								++table.DeckPos;
+							}
+							else
+							{
+								P1.Card2 = Cardname(Deck[table.DeckPos]);
+								P1.Card2Name = Convert.ToString((CardID)P1.Card2);
+								++table.DeckPos;
+								WriteLine("{0}'s cards \n{1}, {2}", P1.Name, P1.Card1Name, P1.Card2Name);
+								P2.Card2 = Cardname(Deck[table.DeckPos]);
+								P2.Card2Name = Convert.ToString((CardID)P2.Card2);
+								++table.DeckPos;
+								WriteLine("{0}'s cards \n{1}, {2}", P2.Name, P2.Card1Name, P2.Card2Name);
+							}
+							break;
+						case 3:
+							if (GoAround == 1)
+							{
+								P3.Card1 = Cardname(Deck[table.DeckPos]);
+								P3.Card1Name = Convert.ToString((CardID)P3.Card1);
+								++table.DeckPos;
+							}
+							else
+							{
+								P3.Card2 = Cardname(Deck[table.DeckPos]);
+								P3.Card2Name = Convert.ToString((CardID)P3.Card2);
+								++table.DeckPos;
+								WriteLine("{0}'s cards \n{1}, {2}", P3.Name, P3.Card1Name, P3.Card2Name);
+							}
+							break;
+						case 4:
+							if (GoAround == 1)
+							{
+								P4.Card1 = Cardname(Deck[table.DeckPos]);
+								P4.Card1Name = Convert.ToString((CardID)P4.Card1);
+								++table.DeckPos;
+							}
+							else
+							{
+								P4.Card2 = Cardname(Deck[table.DeckPos]);
+								P4.Card2Name = Convert.ToString((CardID)P4.Card2);
+								++table.DeckPos;
+								WriteLine("{0}'s cards \n{1}, {2}", P4.Name, P4.Card1Name, P4.Card2Name);
+							}
+							break;
+						case 5:
+							if (GoAround == 1)
+							{
+								P5.Card1 = Cardname(Deck[table.DeckPos]);
+								P5.Card1Name = Convert.ToString((CardID)P5.Card1);
+								++table.DeckPos;
+							}
+							else
+							{
+								P5.Card2 = Cardname(Deck[table.DeckPos]);
+								P5.Card2Name = Convert.ToString((CardID)P5.Card2);
+								++table.DeckPos;
+								WriteLine("{0}'s cards \n{1}, {2}", P5.Name, P5.Card1Name, P5.Card2Name);
+							}
+							break;
+					}
+			}
+
+
+			int BigBlindP;
+			BigBlindP = Dealer + 2;
+			if (BigBlindP > NumOfPlayers)
+				BigBlindP -= NumOfPlayers;
+			if (NumOfPlayers == 2)
+				if (Dealer == 1)
+					BigBlindP = 2;
+				else
+					BigBlindP = 1;
+
+			PreFlop(P1, P2, P3, P4, P5, BigBlindP, NumOfPlayers, table);
+
+			Flop(P1, P2, P3, P4, P5, Dealer, NumOfPlayers, table, TableHand, Deck);
+
+			Turn(P1, P2, P3, P4, P5, Dealer, NumOfPlayers, table, TableHand, Deck);
+
+			River(P1, P2, P3, P4, P5, Dealer, NumOfPlayers, table, TableHand, Deck);
+
+			for (int PlayerNum = 1; PlayerNum <= NumOfPlayers; ++PlayerNum)
+				
+					switch (PlayerNum)
+					{
+					case 1:
+						if (P1.Fold != true)
+							LogicStructure(P1, table, TableHand);
+
+						break;
+					case 2:
+						if (P2.Fold != true)
+							LogicStructure(P2, table, TableHand);
+
+						break;
+					case 3:
+						if (P3.Fold != true)
+							LogicStructure(P3, table, TableHand);
+
+						break;
+					case 4:
+						if (P4.Fold != true)
+							LogicStructure(P4, table, TableHand);
+
+						break;
+					case 5:
+						if (P5.Fold != true)
+							LogicStructure(P5, table, TableHand);
+
+						break;
+				}
+			int[] BestHand = new int[NumOfPlayers];
+			string[] BestPlayerHand = new string[NumOfPlayers];
+			int kicker = 0, count = 0;
+
+			for (int PlayerNum = 1; PlayerNum <= NumOfPlayers; ++PlayerNum)
+				switch (PlayerNum)
+				{
+					case 1:
+						BestHand[count] = P1.HandEval;
+						BestPlayerHand[count] = "P1";
+						kicker = P1.Kicker;
+						break;
+					case 2:
+						if (P2.HandEval >= BestHand[0] && P2.Kicker > kicker)
+						{
+							for (int reset = 0; reset <= 4; ++reset)
+							{
+								BestHand[reset] = 0;
+								BestPlayerHand[reset] = "null";
+							}
+							BestHand[0] = P2.HandEval;
+							BestPlayerHand[0] = "P2";
+							kicker = P2.Kicker;
+						}
+						else if (P2.HandEval == BestHand[0] && P2.Kicker == kicker)
+						{
+							++count;
+							BestHand[count] = P2.HandEval;
+							BestPlayerHand[count] = "P2";
+						}
+						break;
+					case 3:
+						if (P3.HandEval >= BestHand[0] && P3.Kicker > kicker)
+						{
+							for (int reset = 0; reset <= 4; ++reset)
+							{
+								BestHand[reset] = 0;
+								BestPlayerHand[reset] = "null";
+							}
+							BestHand[0] = P3.HandEval;
+							BestPlayerHand[0] = "P3";
+							kicker = P3.Kicker;
+							count = 0;
+						}
+						else if (P3.HandEval == BestHand[0] && P3.Kicker == kicker)
+						{
+							++count;
+							BestHand[count] = P3.HandEval;
+							BestPlayerHand[count] = "P3";
+						}
+
+						break;
+					case 4:
+						if (P4.HandEval >= BestHand[0] && P4.Kicker > kicker)
+						{
+							for (int reset = 0; reset <= 4; ++reset)
+							{
+								BestHand[reset] = 0;
+								BestPlayerHand[reset] = "null";
+							}
+							BestHand[0] = P4.HandEval;
+							BestPlayerHand[0] = "P4";
+							kicker = P4.Kicker;
+							count = 0;
+						}
+						else if (P4.HandEval == BestHand[0] && P4.Kicker == kicker)
+						{
+							++count;
+							BestHand[count] = P4.HandEval;
+							BestPlayerHand[count] = "P4";
+						}
+
+						break;
+					case 5:
+						if (P5.HandEval >= BestHand[0] && P5.Kicker > kicker)
+						{
+							for (int reset = 0; reset <= 4; ++reset)
+							{
+								BestHand[reset] = 0;
+								BestPlayerHand[reset] = "null";
+							}
+							BestHand[0] = P5.HandEval;
+							BestPlayerHand[0] = "P5";
+							kicker = P5.Kicker;
+							count = 0;
+
+						}
+						else if (P5.HandEval == BestHand[0] && P5.Kicker == kicker)
+						{
+							++count;
+							BestHand[count] = P5.HandEval;
+							BestPlayerHand[count] = "P5";
+						}
+
+						break;
+				}
+			++count;
+			foreach (string player in BestPlayerHand)
+				switch (player)
+				{
+					case "P1":
+						P1.Money += table.Pot / count;
+						table.Pot = table.Pot - (table.Pot / count);
+						--count;
+						break;
+					case "P2":
+						P2.Money += table.Pot / count;
+                        table.Pot = table.Pot - (table.Pot / count);
+                        --count;
+
+						break;
+					case "P3":
+						P3.Money += table.Pot / count;
+                        table.Pot = table.Pot - (table.Pot / count);
+                        --count;
+
+						break;
+					case "P4":
+						P4.Money += table.Pot / count;
+                        table.Pot = table.Pot - (table.Pot / count);
+                        --count;
+
+						break;
+					case "P5":
+						P5.Money += table.Pot / count;
+                        table.Pot = table.Pot - (table.Pot / count);
+                        --count;
+
+						break;
+					default:
+
+						break;
+				}
+		}
+
+		static void PreFlop(Player P1, Player P2, Player P3, Player P4, Player P5, int BigBlindP, int NumOfPlayers, Table table)
+		{
+			table.OpenBetting = false;
+			int turn = 1, PlayerNum;
+			bool TurnOver = false;
+			table.Calls = 0;
+			PlayerNum = BigBlindP + 1;
+			if (PlayerNum > NumOfPlayers)
+			{
+				PlayerNum = 1;
+			}
+
+			while (TurnOver != true)
+			{
+				WriteLine("Current pot is {0}; PreFlop", table.Pot);
+				switch (PlayerNum)
+				{
+					case 1:
+						if (P1.Fold == false)
+							PlayerInput(P1, turn, table);
+						break;
+					case 2:
+						if (P2.Fold == false)
+							PlayerInput(P2, turn, table);
+						break;
+					case 3:
+						if (P3.Fold == false)
+							PlayerInput(P3, turn, table);
+						break;
+					case 4:
+						if (P4.Fold == false)
+							PlayerInput(P4, turn, table);
+						break;
+					case 5:
+						if (P5.Fold == false)
+							PlayerInput(P5, turn, table);
+						break;
+				}
+				++PlayerNum;
+				if (PlayerNum > NumOfPlayers)
+					PlayerNum = 1;
+				if (PlayerNum == BigBlindP)
+					table.OpenBetting = true;
+				if (table.Folds == NumOfPlayers - 1 || table.Calls == NumOfPlayers - table.Folds)
+					TurnOver = true;
+			}
+		}
+
+		static void Flop(Player P1, Player P2, Player P3, Player P4, Player P5, int Dealer, int NumOfPlayers, Table table, int[] TableHand, params int[] Deck)
+		{
+			;
+			table.TopBet = 0;
+			int turn = 1, PlayerNum = Dealer;
+			table.Calls = 0;
+			bool TurnOver = false;
+			for (int x = 0; x <= 2; ++x)
+			{
+				TableHand[x] = Deck[table.DeckPos];
+				TableHand[x] = Cardname(TableHand[x]);
+				++table.DeckPos;
+			}
+
+
+			while (TurnOver != true)
+			{
+				WriteLine("Current pot is {0}; Flop", table.Pot);
+				++PlayerNum;
+				if (PlayerNum > NumOfPlayers)
+					PlayerNum = 1;
+				switch (PlayerNum)
+				{
+					case 1:
+						if (P1.Fold == false)
+							PlayerInput(P1, turn, table);
+						break;
+					case 2:
+						if (P2.Fold == false)
+							PlayerInput(P2, turn, table);
+						break;
+					case 3:
+						if (P3.Fold == false)
+							PlayerInput(P3, turn, table);
+						break;
+					case 4:
+						if (P4.Fold == false)
+							PlayerInput(P4, turn, table);
+						break;
+					case 5:
+						if (P5.Fold == false)
+							PlayerInput(P5, turn, table);
+						break;
+				}
+				if (table.Folds == NumOfPlayers - 1 || table.Calls == NumOfPlayers - table.Folds)
+					TurnOver = true;
+			}
+		}
+
+		static void Turn(Player P1, Player P2, Player P3, Player P4, Player P5, int Dealer, int NumOfPlayers, Table table, int[] TableHand, params int[] Deck)
+		{
+			table.TopBet = 0;
+			int turn = 1, PlayerNum = Dealer;
+			table.Calls = 0;
+			bool TurnOver = false;
+
+			TableHand[3] = Deck[table.DeckPos];
+			TableHand[3] = Cardname(TableHand[3]);
+			++table.DeckPos;
+
+			while (TurnOver != true)
+			{
+				WriteLine("Current pot is {0}; Turn", table.Pot);
+				++PlayerNum;
+				if (PlayerNum > NumOfPlayers)
+					PlayerNum = 1;
+				switch (PlayerNum)
+				{
+					case 1:
+						if (P1.Fold == false)
+							PlayerInput(P1, turn, table);
+						break;
+					case 2:
+						if (P2.Fold == false)
+							PlayerInput(P2, turn, table);
+						break;
+					case 3:
+						if (P3.Fold == false)
+							PlayerInput(P3, turn, table);
+						break;
+					case 4:
+						if (P4.Fold == false)
+							PlayerInput(P4, turn, table);
+						break;
+					case 5:
+						if (P5.Fold == false)
+							PlayerInput(P5, turn, table);
+						break;
+				}
+				if (table.Folds == NumOfPlayers - 1 || table.Calls == NumOfPlayers - table.Folds)
+					TurnOver = true;
+			}
+		}
+
+		static void River(Player P1, Player P2, Player P3, Player P4, Player P5, int Dealer, int NumOfPlayers, Table table, int[] TableHand, params int[] Deck)
+		{
+			table.TopBet = 0;
+			int turn = 1, PlayerNum = Dealer;
+			table.Calls = 0;
+			bool TurnOver = false;
+			TableHand[4] = Deck[table.DeckPos];
+			TableHand[4] = Cardname(TableHand[4]);
+			++table.DeckPos;
+
+			while (TurnOver != true)
+			{
+				WriteLine("Current pot is {0}; River", table.Pot);
+				++PlayerNum;
+				if (PlayerNum > NumOfPlayers)
+					PlayerNum = 1;
+				switch (PlayerNum)
+				{
+					case 1:
+						if (P1.Fold == false)
+							PlayerInput(P1, turn, table);
+						break;
+					case 2:
+						if (P2.Fold == false)
+							PlayerInput(P2, turn, table);
+						break;
+					case 3:
+						if (P3.Fold == false)
+							PlayerInput(P3, turn, table);
+						break;
+					case 4:
+						if (P4.Fold == false)
+							PlayerInput(P4, turn, table);
+						break;
+					case 5:
+						if (P5.Fold == false)
+							PlayerInput(P5, turn, table);
+						break;
+				}
+				if (table.Folds == NumOfPlayers - 1 || table.Calls == NumOfPlayers - table.Folds)
+					TurnOver = true;
+			};
+		}
+
+		private static void PlayerInput(Player temp, int turn, Table table)
+		{
+			string PlayerInput;
+			int amount = 0;
+			bool ValidInput = false;
+			WriteLine("{0}'s turn with ${1}", temp.Name, temp.Money);
+			WriteLine(table.TopBet);
+			do
+			{
+				Write("Press 'b' to Bet, 'r' to Raise,'c' to call/check, or 'f' to Fold >> ");//if you fold you give up your hand
+				PlayerInput = ReadLine();
+				switch (PlayerInput)
+				{
+					case "b":
+						if (table.OpenBetting == true)
+						{
+							WriteLine("Bet how huch?");
+							try
+							{
+								amount = Convert.ToInt32(ReadLine());
+								if (amount >= table.MinimumBet)
+									if (amount + temp.CurrentPot > table.TopBet)
+										if (temp.Money >= amount)
+										{
+											temp.Money -= amount;
+											temp.CurrentPot += amount;
+											table.Pot += amount;
+											table.TopBet = amount;
+											table.Calls = 1;
+											ValidInput = true;
+										}
+										else
+										{
+											Write("Not enough money");
+										}
+									else
+										WriteLine("you need to bet more than the current highest bet");
+								else
+									WriteLine("You must bet more than the minimum bet requirement: ${0}", table.MinimumBet);
+
+							}
+							catch (FormatException e)
+							{
+								WriteLine(e.Message);
+							}
+						}
+						else
+						{
+							WriteLine("You can't raise or bet yet");
+						}
+
+						break;
+					case "r"://raise
+						if (table.OpenBetting == true)
+						{
+							WriteLine("Raise by how much?");
+							try
+							{
+								amount = Convert.ToInt32(ReadLine());
+								if (amount >= table.MinimumBet)
+								{
+									amount += table.TopBet;
+									if (temp.Money >= amount)
+									{
+										temp.Money -= amount;
+										temp.CurrentPot += amount;
+										table.Pot += amount;
+										table.TopBet = amount;
+										table.Calls = 1;
+										ValidInput = true;
+									}
+									else
+									{
+										WriteLine("You're Broke!");
+									}
+								}
+								else
+									WriteLine("You must raise by the minimum bet amount: ${0}", table.MinimumBet);
+							}
+							catch (FormatException e)
+							{
+								WriteLine(e.Message);
+							}
+						}
+						else
+						{
+							WriteLine("You can't raise or bet yet");
+						}
+
+						break;
+					case "f"://fold
+						temp.Fold = true;
+						WriteLine("You folded your hand");
+						++table.Folds;
+						ValidInput = true;
+						break;
+
+
+					case "c"://call/check
+						if (temp.CurrentPot != table.TopBet)
+							WriteLine("You called");
+						else
+							WriteLine("You checked");
+
+						amount = table.TopBet - temp.CurrentPot;
+						WriteLine(amount);
+						if (temp.Money < amount)
+						{
+							amount = temp.Money;
+							table.Pot += amount;
+							temp.Money -= amount;
+							temp.CurrentPot += amount;
+						}
+						else
+						{
+							temp.Money -= amount;
+							table.Pot += amount;
+							temp.CurrentPot += amount;
+						}
+						++table.Calls;
+						ValidInput = true;
+						break;
+
+					default:
+						WriteLine("Enter a valid input");
+						break;
+
+
+
+				}
+			} while (ValidInput != true);
+
+			temp.CurrentPot = 0;
+		}
+
+		static void LogicStructure(Player temp, Table table, params int[] TableHand)
+		{
+			
+			
+string[,] AllPossibleHandsNumbers = new string[15, 5]//this array is geting all the possible hands and getting just the number part of the card and placing them into the array
+			{	{ Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2) },
+				{ Convert.ToString(TableHand[1]).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2),   Convert.ToString(temp.Card1).Substring(1,2) },
+				{ Convert.ToString(TableHand[2]).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2),   Convert.ToString(temp.Card1).Substring(1,2),   Convert.ToString(temp.Card2).Substring(1,2) },
+				{ Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2),   Convert.ToString(temp.Card1).Substring(1,2),   Convert.ToString(temp.Card2).Substring(1,2), Convert.ToString(TableHand[0]).Substring(1,2) },
+				{ Convert.ToString(TableHand[4]).Substring(1,2),   Convert.ToString(temp.Card1).Substring(1,2),   Convert.ToString(temp.Card2).Substring(1,2), Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2) },
+				{   Convert.ToString(temp.Card1).Substring(1,2),   Convert.ToString(temp.Card2).Substring(1,2), Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2) },
+				{   Convert.ToString(temp.Card2).Substring(1,2), Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2) },
+				{ Convert.ToString(TableHand[0]).Substring(1,2),   Convert.ToString(temp.Card1).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2) },
+				{ Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2),   Convert.ToString(temp.Card1).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2) },
+				{ Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2),   Convert.ToString(temp.Card1).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2) },
+				{ Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2),   Convert.ToString(temp.Card1).Substring(1,2) },
+				{   Convert.ToString(temp.Card2).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2) },
+				{ Convert.ToString(TableHand[0]).Substring(1,2),   Convert.ToString(temp.Card2).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2) },
+				{ Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2),   Convert.ToString(temp.Card2).Substring(1,2), Convert.ToString(TableHand[3]).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2) },
+				{ Convert.ToString(TableHand[0]).Substring(1,2), Convert.ToString(TableHand[1]).Substring(1,2), Convert.ToString(TableHand[2]).Substring(1,2),   Convert.ToString(temp.Card2).Substring(1,2), Convert.ToString(TableHand[4]).Substring(1,2) } };
+
+		
+			string[,] AllPossibleHandsSuits = new string[15, 5]/*thiss array is getting all the possible card hand combinations for suits*/
+		{ { Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1) },
+				{ Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1), Convert.ToString(temp.Card1).Substring(0,1) },
+				{ Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1), Convert.ToString(temp.Card1).Substring(0,1), Convert.ToString(temp.Card2).Substring(0,1) },
+				{ Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1), Convert.ToString(temp.Card1).Substring(0,1), Convert.ToString(temp.Card2).Substring(0,1), Convert.ToString(TableHand[0]).Substring(0,1) },
+				{ Convert.ToString(TableHand[4]).Substring(0,1), Convert.ToString(temp.Card1).Substring(0,1), Convert.ToString(temp.Card2).Substring(0,1), Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1) },
+				{ Convert.ToString(temp.Card1).Substring(0,1), Convert.ToString(temp.Card2).Substring(0,1), Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1) },
+				{ Convert.ToString(temp.Card2).Substring(0,1), Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1) },
+				{ Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(temp.Card1).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1) },
+				{ Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(temp.Card1).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1) },
+				{ Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(temp.Card1).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1)},
+				{ Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(temp.Card1).Substring(0,1)},
+				{ Convert.ToString(temp.Card2).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1)},
+				{ Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(temp.Card2).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1)},
+				{ Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(temp.Card2).Substring(0,1), Convert.ToString(TableHand[3]).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1)},
+				{ Convert.ToString(TableHand[0]).Substring(0,1), Convert.ToString(TableHand[1]).Substring(0,1), Convert.ToString(TableHand[2]).Substring(0,1), Convert.ToString(temp.Card2).Substring(0,1), Convert.ToString(TableHand[4]).Substring(0,1)} };
+
+
+			int value = 0;
+			int[] HandNumbers = new int[5];//this array is for the hands in the first 2d array 
+			int[] HandSuits = new int[5];//this array is for the hands in the second 2d array
+			for (int x = 0; x <= 14; ++x)/*repeats for every hand in the 2d arra iky this is a block comment use them as they suit your style of commenting. my style of not commenting at all*/
+			{
+				for (int y = 0; y <= 4; ++y)
+				{
+						HandNumbers[y] = Convert.ToInt32(AllPossibleHandsNumbers[x, y]);
+						HandSuits[y] = Convert.ToInt32(AllPossibleHandsSuits[x, y]);
+				}
+				Array.Sort(HandNumbers);
+				Array.Sort(HandSuits);
+
+
+				value = 1;
+				if (HandNumbers[0] == HandNumbers[1] - 1 && HandNumbers[1] == HandNumbers[2] - 1 && HandNumbers[2] == HandNumbers[3] - 1 && HandNumbers[3] == HandNumbers[4] - 1 || HandNumbers[0] == 1 && HandNumbers[1] == 10 && HandNumbers[2] == 11 && HandNumbers[3] == 12 && HandNumbers[4] == 13)//detects straight
+				{
+					value = 5;//straight
+				}
+
+				if (HandSuits[0] == HandSuits[4])//detects flush
+				{
+					value = 6;
+					if (value == 5)
+						if (HandNumbers[0] == 1 && HandNumbers[4] == 13)
+							value = 10;
+						else
+							value = 9;
+				}
+
+
+
+				int SameCards1 = 1, SameCards2 = 0, SameCards3 = 0, SameCards4 = 0, SameCards5 = 0;
+				for (int HandPos = 0; HandPos <= 4; ++HandPos)//detects same card numbers
+				{
+					switch (HandPos + 1)
+					{
+						case 1:
+
+							if (HandNumbers[HandPos] == HandNumbers[HandPos + 1])
+							{
+								++SameCards1;
+							}
+							else
+							{
+								++SameCards2;
+							}
+							break;
+						case 2:
+
+							if (HandNumbers[HandPos] == HandNumbers[HandPos + 1])
+							{
+								++SameCards2;
+							}
+							else
+							{
+								++SameCards3;
+							}
+							break;
+						case 3:
+
+							if (HandNumbers[HandPos] == HandNumbers[HandPos + 1])
+							{
+								++SameCards3;
+							}
+							else
+							{
+								++SameCards4;
+							}
+							break;
+						case 4:
+
+							if (HandNumbers[HandPos] == HandNumbers[HandPos + 1])
+							{
+								++SameCards4;
+							}
+							else 
+							{
+								++SameCards5;
+							}
+							break;
+					}
+				}
+
+				int Pairs = 0;
+				bool ThreeOfAKind = false;
+				if (SameCards1 >= 2)
+				{
+					if (SameCards1 == 2)
+						++Pairs;//pairs | 1 pair = 2 | 2 pair = 3
+					if (SameCards1 == 3)
+						ThreeOfAKind = true;//three of a kind value = 4
+				}
+				if (SameCards2 >= 2)
+				{
+					if (SameCards2 == 4)//four of a kind
+						value = 8;
+					if (SameCards2 == 2)
+						++Pairs;//pairs | 1 pair = 2 | 2 pair = 3
+					if (SameCards2 == 3)
+						ThreeOfAKind = true;//three of a kind value = 4
+				}
+				if (SameCards3 == 2)
+				{
+					if (SameCards3 == 2)
+						++Pairs;//pairs | 1 pair = 2 | 2 pair = 3
+					if (SameCards3 == 3)
+						ThreeOfAKind = true;//three of a kind value = 4
+				}
+				if (SameCards4 == 2)
+				{
+					++Pairs;//pairs | 1 pair = 2 | 2 pair = 3
+				}
+
+				if (Pairs + 1 > value)
+					value = Pairs + 1;
+
+				if (ThreeOfAKind == true)
+					value = 4;
+
+				if (Pairs == 1 && ThreeOfAKind == true)//full house
+				{
+					value = 7;
+				}
+
+				if (SameCards1 == 4)//four of a kind
+				{
+					if (value < 8)
+						value = 8;
+				}
+
+				if (value > temp.HandEval)
+				{
+					temp.HandEval = value;
+					if (HandNumbers[0] == 1)
+						temp.Kicker = 14;
+					else
+						temp.Kicker = HandNumbers[4];
+				}
+
+			}
+		}
+
+		static void Shuffle(params int[] Deck)
+		{
+			int[] DeckCopy = new int[] { 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60, 60 };
+			Random ranNumberGenerator = new Random();
+			int max = 53, min = 1, randomNumber, maxtest = 0, numtest;
+
+			for (int Count = 0; Count < 52; ++Count)//resets deck
+				Deck[Count] = 60;
+
+			for (int x = 0; x <= 51;)
+			{
+				for (int y = 0; y < 51; ++y)//copys deck
+					DeckCopy[y] = Deck[y];
+
+				Array.Sort(DeckCopy);//sorts deckcopy
+
+				while (max - 1 == DeckCopy[x - maxtest])//decreases the maximum of the number generator dpending on whether the maximum number has already been generated
+				{
+					--max;
+					++maxtest;
+					if (maxtest >= x)
+					{
+						maxtest -= 2;
+						break;
+					}
+				}
+
+				while (min == DeckCopy[min - 1])//increases the minimum of the number generator dpending on whether the dpending on whether the maximum number has already been generated number has already been generated
+				{
+					++min;
+				}
+				randomNumber = ranNumberGenerator.Next(min, max);//generates number
+
+				numtest = Array.BinarySearch(DeckCopy, randomNumber);//checks to see if the generated number has aleady been added to the array
+				if (numtest < 0)//if it hasnt its added
+				{
+					Deck[x] = randomNumber;
+					++x;
+					if (maxtest == 0)
+					{
+						maxtest = 1;
+					}
+				}
+			}
+
+			WriteLine("Done Shuffling");
+		}
+		static int Cardname(int CardNumber)
+		{
+			switch (CardNumber)
+			{
+				case 1:
+					return Convert.ToInt32(CardID.A_sp);
+				case 2:
+					return Convert.ToInt32(CardID.II_sp);
+				case 3:
+					return Convert.ToInt32(CardID.III_sp);
+				case 4:
+					return Convert.ToInt32(CardID.IV_sp);
+				case 5:
+					return Convert.ToInt32(CardID.V_sp);
+				case 6:
+					return Convert.ToInt32(CardID.VI_sp);
+				case 7:
+					return Convert.ToInt32(CardID.VII_sp);
+				case 8:
+					return Convert.ToInt32(CardID.VIII_sp);
+				case 9:
+					return Convert.ToInt32(CardID.IX_sp);
+				case 10:
+					return Convert.ToInt32(CardID.X_sp);
+				case 11:
+					return Convert.ToInt32(CardID.J_sp);
+				case 12:
+					return Convert.ToInt32(CardID.Q_sp);
+				case 13:
+					return Convert.ToInt32(CardID.K_sp);
+				case 14:
+					return Convert.ToInt32(CardID.A_he);
+				case 15:
+					return Convert.ToInt32(CardID.II_he);
+				case 16:
+					return Convert.ToInt32(CardID.III_he);
+				case 17:
+					return Convert.ToInt32(CardID.IV_he);
+				case 18:
+					return Convert.ToInt32(CardID.V_he);
+				case 19:
+					return Convert.ToInt32(CardID.VI_he);
+				case 20:
+					return Convert.ToInt32(CardID.VII_he);
+				case 21:
+					return Convert.ToInt32(CardID.VIII_he);
+				case 22:
+					return Convert.ToInt32(CardID.IX_he);
+				case 23:
+					return Convert.ToInt32(CardID.X_he);
+				case 24:
+					return Convert.ToInt32(CardID.J_he);
+				case 25:
+					return Convert.ToInt32(CardID.Q_he);
+				case 26:
+					return Convert.ToInt32(CardID.K_he);
+				case 27:
+					return Convert.ToInt32(CardID.A_cl);
+				case 28:
+					return Convert.ToInt32(CardID.II_cl);
+				case 29:
+					return Convert.ToInt32(CardID.III_cl);
+				case 30:
+					return Convert.ToInt32(CardID.IV_cl);
+				case 31:
+					return Convert.ToInt32(CardID.V_cl);
+				case 32:
+					return Convert.ToInt32(CardID.VI_cl);
+				case 33:
+					return Convert.ToInt32(CardID.VII_cl);
+				case 34:
+					return Convert.ToInt32(CardID.VIII_cl);
+				case 35:
+					return Convert.ToInt32(CardID.IX_cl);
+				case 36:
+					return Convert.ToInt32(CardID.X_cl);
+				case 37:
+					return Convert.ToInt32(CardID.J_cl);
+				case 38:
+					return Convert.ToInt32(CardID.Q_cl);
+				case 39:
+					return Convert.ToInt32(CardID.K_cl);
+				case 40:
+					return Convert.ToInt32(CardID.A_di);
+				case 41:
+					return Convert.ToInt32(CardID.II_di);
+				case 42:
+					return Convert.ToInt32(CardID.III_di);
+				case 43:
+					return Convert.ToInt32(CardID.IV_di);
+				case 44:
+					return Convert.ToInt32(CardID.V_di);
+				case 45:
+					return Convert.ToInt32(CardID.VI_di);
+				case 46:
+					return Convert.ToInt32(CardID.VII_di);
+				case 47:
+					return Convert.ToInt32(CardID.VIII_di);
+				case 48:
+					return Convert.ToInt32(CardID.IX_di);
+				case 49:
+					return Convert.ToInt32(CardID.X_di);
+				case 50:
+					return Convert.ToInt32(CardID.J_di);
+				case 51:
+					return Convert.ToInt32(CardID.Q_di);
+				case 52:
+					return Convert.ToInt32(CardID.K_di);
+			}
+			return 0;
+
+		}
+	}
+	class Player
+	{
+		protected string name;
+		protected int card1;
+		protected string card1name;
+		protected int card2;
+		protected string card2name;
+		protected int money;
+		protected int currentPot;
+		protected bool fold;
+		protected int handEval;
+		protected int kicker;
+		public int Kicker
+		{
+			get
+			{
+				return kicker;
+			}
+			set
+			{
+				kicker = value;
+			}
+		}
+		public int HandEval
+		{
+			get
+			{
+				return handEval;
+			}
+			set
+			{
+				handEval = value;
+			}
+		}
+		public bool Fold
+		{
+			get
+			{
+				return fold;
+			}
+			set
+			{
+				fold = value;
+			}
+		}
+		public string Name
+		{
+			get
+			{
+				return name;
+			}
+			set
+			{
+				name = value;
+			}
+		}
+		public int Money
+		{
+			get
+			{
+				return money;
+			}
+			set
+			{
+				money = value;
+			}
+		}
+		public int Card1
+		{
+			get
+			{
+				return card1;
+			}
+			set
+			{
+				card1 = value;
+			}
+		}
+		public int Card2
+		{
+			get
+			{
+				return card2;
+			}
+			set
+			{
+				card2 = value;
+			}
+		}
+		public string Card1Name
+		{
+			get
+			{
+				return card1name;
+			}
+			set
+			{
+				card1name = value;
+			}
+		}
+		public string Card2Name
+		{
+			get
+			{
+				return card2name;
+			}
+			set
+			{
+				card2name = value;
+			}
+		}
+		public int CurrentPot
+		{
+			get
+			{
+				return currentPot;
+			}
+			set
+			{
+				currentPot = value;
+			}
+		}
+	}
+	class Table
+	{
+		protected int pot;
+		protected int calls;
+		protected int topBet;
+		protected int folds;
+		protected bool openBetting;
+		protected int minimumBet;
+		protected int deckPos;
+		public int DeckPos
+		{
+			get
+			{
+				return deckPos;
+			}
+			set
+			{
+				deckPos = value;
+			}
+		}
+		public int MinimumBet
+		{
+			get
+			{
+				return minimumBet;
+			}
+			set
+			{
+				minimumBet = value;
+			}
+		}
+		public bool OpenBetting
+		{
+			get
+			{
+				return openBetting;
+			}
+			set
+			{
+				openBetting = value;
+			}
+		}
+		public int Folds
+		{
+			get
+			{
+				return folds;
+			}
+			set
+			{
+				folds = value;
+			}
+		}
+		public int TopBet
+		{
+			get
+			{
+				return topBet;
+			}
+			set
+			{
+				topBet = value;
+			}
+		}
+		public int Pot
+		{
+			get
+			{
+				return pot;
+			}
+			set
+			{
+				pot = value;
+			}
+		}
+		public int Calls
+		{
+			get
+			{
+				return calls;
+			}
+			set
+			{
+				calls = value;
+			}
+		}
+	}
+}
